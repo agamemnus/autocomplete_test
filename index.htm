@@ -46,23 +46,24 @@ function createTextarea () {
  textarea.style.padding = "8px"
  textarea.contentEditable = true
  document.body.appendChild(textarea)
- textarea.addEventListener("keypress", function (evt) {
-  if (evt.code.toLowerCase() == "enter") {
-   evt.preventDefault()
-   var element = evt.currentTarget
-   var autocompleteString = textarea.getAttribute('data-before')
-   if (autocompleteString !== null && autocompleteString != "") {
-    autocompleteString = textarea.innerHTML + autocompleteString.trim()
-    textarea.innerHTML = autocompleteString
-    textarea.setAttribute('data-before', "")
-    var range = document.createRange()
-    var sel = window.getSelection()
-    range.setStart(textarea.childNodes[0], autocompleteString.length)
-    range.collapse(true)
-    sel.removeAllRanges()
-    sel.addRange(range)
-   }
-  }
+ textarea.addEventListener("keydown", function (evt) {
+  if (evt.code.toLowerCase() != "arrowright") return
+  var sel = window.getSelection()
+  if (sel.rangeCount) var range = sel.getRangeAt(0)
+  if (!range.collapsed || textarea.innerHTML.length != range.endOffset) return
+  var element = evt.currentTarget
+  var autocompleteString = textarea.getAttribute('data-before')
+  if (autocompleteString === null || autocompleteString == "") return
+  evt.preventDefault()
+  autocompleteString = textarea.innerHTML + autocompleteString.trim()
+  textarea.innerHTML = autocompleteString
+  textarea.setAttribute('data-before', "")
+  var range = document.createRange()
+  var sel = window.getSelection()
+  range.setStart(textarea.childNodes[0], autocompleteString.length)
+  range.collapse(true)
+  sel.removeAllRanges()
+  sel.addRange(range)
  })
  textarea.addEventListener("input", function (evt) {
   var element = evt.currentTarget, string = element.innerHTML
