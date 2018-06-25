@@ -47,6 +47,24 @@ function createTextarea () {
  textarea.contentEditable = true
  document.body.appendChild(textarea)
  
+ textarea.addEventListener("keypress", function (evt) {
+  if (evt.code.toLowerCase() == "enter") {
+   evt.preventDefault()
+   var element = evt.currentTarget
+   var autocompleteString = textarea.getAttribute('data-before')
+   if (autocompleteString !== null && autocompleteString != "") {
+    autocompleteString = textarea.innerHTML + autocompleteString.trim()
+    textarea.innerHTML = autocompleteString
+    textarea.setAttribute('data-before', "")
+    var range = document.createRange()
+    var sel = window.getSelection()
+    range.setStart(textarea.childNodes[0], autocompleteString.length)
+    range.collapse(true)
+    sel.removeAllRanges()
+    sel.addRange(range)
+   }
+  }
+ })
  textarea.addEventListener("input", function (evt) {
   var element = evt.currentTarget, string = element.innerHTML
   var searchString = string.substr(string.lastIndexOf(" ") + 1).trim()
@@ -55,7 +73,6 @@ function createTextarea () {
   element.setAttribute('data-before', autocompleteString.substr(string.length))
   element.style.backgroundColor = (autocompleteString) ? "#adf5b7" : ""
  })
-}
 </script>
 </head>
 <body></body>
