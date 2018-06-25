@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<style type="text/css" .test:after {content: attr(data-before); color: grey; top: 0; left: 0}</style>
+<script type="text/javascript">
+var replace_list = ["albatross", "alabama", "arkansas", "badd", "bad", "good", "apple", "corn"]
+var tree = {branches: {}}
+tree.add = function (text) {
+ var lText = text.toLowerCase()
+ var branch = this.branches
+ for (var i = 0; i < lText.length; i++) {
+  if (typeof branch[lText[i]] == "undefined") branch[lText[i]] = {}
+  branch = branch[lText[i]]
+ }
+ branch[lText] = text
+}
+tree.search = function (text, hint) {
+ if (text == "") return ""
+ var lText = text.toLowerCase()
+ var branch = this.branches
+ for (var i = 0; i < lText.length; i++) {
+  branch = branch[lText[i]]
+  if (typeof branch == "undefined") return false
+ }
+ if (typeof branch[lText] == "undefined") {
+  if (!hint) return i
+  while (true) {
+   var keys = Object.keys(branch)
+   if (typeof branch[keys[0]] == "string") return branch[keys[0]]
+   var branch = branch[keys[Math.floor(Math.random() * Math.floor(keys.length))]]
+   if (typeof branch == "string") return branch
+  }
+ }
+ return branch[lText]
+}
+replace_list.forEach(function (w) {tree.add(w)})
+
+window.addEventListener('load', createTextarea)
+
+function createTextarea () {
+ var textarea = document.createElement("div")
+ textarea.className = "test"
+ textarea.style.border = "4px solid #efefef"
+ textarea.style.fontFamily = "open sans"
+ textarea.style.margin = "8px"
+ textarea.style.padding = "8px"
+ textarea.contentEditable = true
+ document.body.appendChild(textarea)
+ 
+ textarea.addEventListener("input", function (evt) {
+  var element = evt.currentTarget, string = element.innerHTML
+  var searchString = string.substr(string.lastIndexOf(" ") + 1).trim()
+  var autocompleteString = tree.search(searchString, true)
+  if (autocompleteString === false) autocompleteString = ""
+  element.setAttribute('data-before', autocompleteString.substr(string.length))
+  element.style.backgroundColor = (autocompleteString) ? "#adf5b7" : ""
+ })
+}
+</script>
+</head>
+<body></body>
+</html>
